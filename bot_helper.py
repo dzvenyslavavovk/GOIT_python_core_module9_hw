@@ -1,57 +1,55 @@
 contacts={}
 
 def input_error(func):
-    def inner(data):
+    def inner(*args, **kwargs):
         try:
-            result = func(data)
-            return result
+            return func(*args, **kwargs)
         except KeyError:
-            print("User with such name is not available.")
+            return 'User with such name is not available.'
         except ValueError:
-            print("Name and phone are not given.")
+            return 'Name and phone are not given.'
         except IndexError:
-            print("Name and phone are not given.")
+            return 'Name and phone are not given.'
     return inner
 
 def hello(_):
-    print('How can I help you?')
+    return 'How can I help you?'
 
 @input_error
 def add(contact):
-    name=contact[0]
-    phone=contact[1]
+    name, phone, *_ = contact
     contacts[name]=phone
-    print (f'Number {phone} with name {name} was added.')
+    return f'Number {phone} with name {name} was added.'
 
 @input_error
 def change(contact):
-    name=contact[0]
-    phone=contact[1]
-    for key in contacts.keys():
+    name, phone, *_ = contact
+    for key in contacts:
         if key == name:
             contacts[key] = phone
-            print (f'Number {phone} with name {name} was changed.')
+            return f'Number {phone} with name {name} was changed.'
         else:
-            print (f'Number {phone} with name {name} does not exist.')
+            return f'Number {phone} with name {name} does not exist.'
 
 @input_error
 def phone(contact):
-    print (f'{contact} number is {contacts[contact[0]]}.')     
+    return f'{contact} number is {contacts[contact[0]]}.'     
 
 def show_all(_):
-    if len(contacts)>0:
-        print('There are all contacts:')
+    if contacts:
+        result=''
         for name, phone in contacts.items():
-            print(f'{name} : {phone}')
+            result+= f'{name} : {phone} \n'
+        return result
     else:
-        print('There are no contacts.')
+        return 'There are no contacts.'
 
 def bye(_):
-    print('Good bye!')
-    exit()
+    return 'Good bye!'
+    
 
 def unknown_action(_):
-    print('Such command is not available')
+    return 'Such command is not available'
 
 COMMANDS = {
     'hello': hello,
@@ -86,7 +84,10 @@ def main():
         command=input('Input command: ')
         handler,info=handler_input(command)
         try:
-            handler(info)
+            result=handler(info)
+            print(result)
+            if result=='Good bye!':
+                exit()
         except KeyError:
             print('Such command is not available')
 main()
